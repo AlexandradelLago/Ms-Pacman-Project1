@@ -1,9 +1,8 @@
-function Ghost(canvas,x,y,vX,vY,alive,img,escala){
-  this.ctx=canvas.getContext("2d");
-  this.escala=escala;
+function Ghost(x,y,vX,vY,alive,img){
+  Collision.call(this);
   this.x=x*escala;
   this.y=y*escala;
-  this.vel=2;
+  this.vel=1;
   this.direction=["up","down","left","right"];
   this.width=2.5*escala;
   this.height=2.5*escala;
@@ -18,11 +17,11 @@ function Ghost(canvas,x,y,vX,vY,alive,img,escala){
 
 Ghost.prototype.drawGhost= function (){
   this.frame+=1;
-  if (this.frame%50===0){
+  if (this.frame%120===0){
     this.updateGhost(this.index=Math.floor(Math.random()*4));
   }
   this.updateGhost(this.index);
-  this.ctx.drawImage(this.img,this.x,this.y,this.width,this.height);
+  ctx.drawImage(this.img,this.x,this.y,this.width,this.height);
 }
 
 
@@ -43,11 +42,6 @@ Ghost.prototype.updateGhost=function(index){
       break;
   }
 }
-
-
-Ghost.prototype.collision= function(){
-
-};
 
 Ghost.prototype.vulnerability =function(){
     this.vulnerability=true;

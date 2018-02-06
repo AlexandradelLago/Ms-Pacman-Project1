@@ -1,40 +1,36 @@
-function Pacman(canvas,escala) {
-    this.ctx=canvas.getContext("2d");
-    this.escala=escala;
+function Pacman() {
+    Collision.call(this);
     this.x=18*escala;
-    this.y=13.7*escala;
-    this.vel=2;
+    this.y=14*escala;
+    this.vel=1;
     this.lives=3;
-    this.width=3*escala;
-    this.height=3*escala;
+    this.width=50;
+    this.height=50;
     this.img = new Image();
-    this.animation={eatingPacman:"./images/ms_pac_man.png",chewingPacman:"./images/closedPacman.png"};
-    this.img.src=this.animation.eatingPacman;
-    this.img.addEventListener("load",this.drawPacman.bind(this));
+    this.img.src=images.eatingPacman;
+    // el this dentro de addEventlistere seria la imagen para que siga hablando de la claase
+    // board le pongo el bind 
+    // this.img.onload=function(){}.bind.this
+    this.img.onload= function(){
+        this.drawPacman();}.bind(this);
     this.finalScore=[0,0];
     this.player=1;
     this.score=0;
     this.direction="";
-
+    this.frame=0;
+    this.stopped=false;
 };
-
-function animate(){
- //   console.log(this.img.src);
-    if (this.img.src===this.animation.eatingPacman){
-        this.img.src=this.animation.chewingPacman;
-    } else {
-        this.img.src=this.animation.eatingPacman;
-    }
-
-}
-
+// hacer que pacman me cambie de imagen con los sprite pero PRIMORDIAL es el movimiento
 Pacman.prototype.drawPacman= function (){
-    
-    if (!this.collision()){
-    this.updatePacman();
+    this.frame+=1;
+    if (this.frames%60===0){
+        if (this.animation===this.animation1){
+            this.animation=this.animation2;
+        } else {
+            this.animation=this.animation2;
+        }
     }
-    this.ctx.drawImage(this.img,this.x,this.y,this.width,this.height);
-   // setInterval(animate, 1000/30);
+    ctx.drawImage(this.img,this.x,this.y,this.width,this.height); 
 }
 Pacman.prototype.updatePacman=function(){
         switch (this.direction) {
@@ -53,47 +49,25 @@ Pacman.prototype.updatePacman=function(){
         }
 }
 Pacman.prototype.moveUp = function(){
-        if (!this.collision()){
-        this.y-=2;
-        this.direction="up";
-        }
+        
+        this.y-=2; 
 };
 
 Pacman.prototype.moveDown = function(){
-    if (!this.collision()){
         this.y+=2;
-        this.direction="down";
-    }
 };
 
 Pacman.prototype.moveLeft = function(){
-    if (!this.collision()){
         this.x-=2;
-        this.direction="left";
-    }
 };
 
 Pacman.prototype.moveRight = function(){
-    if (!this.collision()){
-        this.x+=2;
-        this.direction="right";
-    }        
+        this.x+=2;   
 };
 
 Pacman.prototype.EatFood = function (){
     this.score+=1;
 };
-
-Pacman.prototype.collision = function(){
-    var collision =false;
-    // funcion que tiene que mirar si al moverse choca con un muro o con ghost si muro se para si ghost muere
-    if (this.y<=this.escala*1.8||this.y>=this.escala*17.5||this.x<=2.2*this.escala||this.x>=36*this.escala){
-        collision=true;
-    }
-    return collision;
-}
-
-
 
 Pacman.prototype.killed= function(){
    this.lives--;

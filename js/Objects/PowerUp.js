@@ -1,5 +1,4 @@
-function PowerUp(canvas){
-    this.ctx=canvas.getContext("2d");
+function PowerUp(){
     this.x;
     this.y;
     this.counter=3000;
