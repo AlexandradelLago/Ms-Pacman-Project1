@@ -1,3 +1,8 @@
+body{
+    margin:0;
+    padding:0;
+}
+
 body {
     background: rgb(165, 187, 212);
 }
@@ -6,17 +11,24 @@ header{
     flex-direction: row;
     flex-flow: nowrap;
     justify-content: space-around;
-    background: lightblue;
+    background: rgb(39, 100, 212);
+    padding:0;
 }
 header h1{
-    color:white;
-    text-align: center;
+    color:#db1973;
+    text-align: left;
+    padding:0;
+    margin:0;
 }
 footer{
     background: lightgrey;
 }
 section {
     margin:20px 100px;
+    display:flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    background-image: url("./images/msPacmanBackground.jpg");
 }
 section button{
     width:100px;
@@ -24,6 +36,8 @@ section button{
     border-radius: 30%;
     background-color: #ffe534;
     text-transform: uppercase;
+    writing-mode:vertical-rl;
+    text-orientation:upright;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size:2em;
     margin-left: 20px;
@@ -33,5 +47,10 @@ section button{
 canvas {
     border: 2px solid black;
     justify-content: center;
-    display: inline-block;
+}
+
+div {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    background-image: url("/images/msPacmanBackground.jpg");
 }

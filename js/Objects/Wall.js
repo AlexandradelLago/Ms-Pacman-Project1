@@ -6,7 +6,15 @@
     }
     Wall.prototype.drawWall= function (){
     ctx.beginPath();
-    ctx.fillStyle="#0350fb"
+    if (myGame.pacman.lives===3){
+        console.log(myGame.pacman.life);
+        ctx.fillStyle="#0350fb"
+    }else if (myGame.pacman.lives===2){
+        ctx.fillStyle="#ec5ac5"
+    }else if (myGame.pacman.lives===1){
+        ctx.fillStyle="green";
+    }
+        
     ctx.rect(this.x,this.y,this.width,this.height)
     ctx.fill();
     }   

@@ -19,3 +19,5 @@ Food.prototype.drawFood = function(){
         ctx.fill();
         ctx.closePath();
 }
+
+

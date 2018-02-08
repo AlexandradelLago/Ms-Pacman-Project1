@@ -1,47 +1,77 @@
-function Ghost(x,y,vX,vY,img){
+function Ghost(x,y,img,name,chaserfrequency){
   this.x=x*escala;
   this.y=y*escala;
-  this.vel=1;
-  this.direction=["up","down","right","left","none"];
+  this.name=name;
   this.width=1.8*escala;
   this.height=1.8*escala;
+  this.vel=1;
+  this.direction=["up","down","right","left"];
+  this.index=0;
   this.vulnerability=false;
   this.alive=true;
   this.img= new Image();
   this.img.src=img;
   this.img.addEventListener("load",this.drawGhost.bind(this));
   this.frame=0;
-  this.index=0;
-  this.validPosition=[];
+  this.chasing=true;
+  this.points=500;
+  this.chaserfrequency=chaserfrequency;
+
 };
+
+Ghost.prototype.killed=function (){
+  this.x=18.5*escala;
+  this.y=10*escala;
+  this.vel=1;
+  this.vulnerability=false;
+  this.alive=true;
+  this.index=0;
+}
+
+Ghost.prototype.updateGhost=function(index){
+  switch (index? this.direction[index]:this.direction[this.index]){
+      case "up":
+      this.y-=this.vel; 
+      break;
+      case "down":
+      this.y+=this.vel;
+      break;
+      case "right":
+      this.x+=this.vel;
+      break;
+      case "left":
+      this.x-=this.vel;
+      break;
+  }
+}
 
 Ghost.prototype.drawGhost= function (){
   ctx.drawImage(this.img,this.x,this.y,this.width,this.height);
 }
 /*SEGUIR AQUI!!! ESTOY HACIENDO QUE LOS GHOSTS DECIDAN HACIA ADONDE VAN DEPENDIENDO DE LA DISTANCIA CON PACMAN Y DE SI LA SIGUIENTE POSICION DA ERROR O NO*/ 
 Ghost.prototype.nextMove=function(){
-  var x;
-  var y;
   validPosition=[];
   var randomInd;
+  var c= this.vel+1;
   var f={x:this.x,y:this.y,w:this.width,h:this.height};
  switch (this.index) {
    // choco arriba 
    case 0:
-            // Siguiente hacia abajo
-            f={x:this.x,y:this.y+this.vel+1,w:this.width,h:this.height};
+            
+            f.y=this.y+c;
+            // Vengo de abajo  Siguiente hacia abajo (0,1+c)
             validPosition.push({
               distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y+1),
               x:0,
-              y:this.vel+1+1,
+              y:c+1,
               index:1,
               crash:getCrash(walls,f)
           });
-          // Siguiente a la derecha
-          validPosition.push({
+         
+          validPosition.push({  // Siguiente a la derecha
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x+1,f.y),
             x:1,
-            y:this.vel+1,
+            y:c,
             index:2,
             crash:getCrash(walls,f)
           });
@@ -49,43 +79,43 @@ Ghost.prototype.nextMove=function(){
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x-1,f.y),
             x:-1,
-            y:this.vel+1,
+            y:c,
             index:3,
             crash:getCrash(walls,f) 
           });
               break;
     case 1:
-              f={x:this.x,y:this.y-(this.vel+1),w:this.width,h:this.height};
+              f.y=this.y-c;
             validPosition.push({
               distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x+1,f.y),
               x:1,
-              y:-(this.vel+1),
-              index:0,
+              y:-c,
+              index:2,
               crash:getCrash(walls,f)
             });
           // Siguiente a la derecha
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x-1,f.y),
             x:-1,
-            y:-(this.vel+1),
-            index:2,
+            y:-c,
+            index:3,
             crash:getCrash(walls,f)
           });
           // Siguiente a la izquierda
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y-1),
             x:0,
-            y:-(this.vel+1)-1,
-            index:3,
+            y:-c-1,
+            index:0,
             crash:getCrash(walls,f) 
           });
               break;
      case 2:
               // Siguiente hacia arribaç
-            f={x:this.x-(this.vel+1),y:this.y,w:this.width,h:this.height};
+            f.x=this.x-c;
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y-1),
-            x:-(this.vel+1),
+            x:-c,
             y:-1,
             index:0,
             crash:getCrash(walls,f)
@@ -93,7 +123,7 @@ Ghost.prototype.nextMove=function(){
           // Siguiente hacia abajo
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y+1),
-            x:-(this.vel+1),
+            x:-c,
             y:1,
             index:1,
             crash:getCrash(walls,f)
@@ -101,7 +131,7 @@ Ghost.prototype.nextMove=function(){
         // Siguiente a la izquierda
         validPosition.push({
           distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x-1,f.y),
-          x:-(this.vel+1)-1,
+          x:-c-1,
           y:0,
           index:3,
           crash:getCrash(walls,f) 
@@ -109,10 +139,10 @@ Ghost.prototype.nextMove=function(){
             break;
      case 3:
               // Siguiente hacia arriba
-          f={x:this.x+(this.vel+1),y:this.y,w:this.width,h:this.height};
+          f.x=this.x+c;
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y-1),
-            x:(this.vel+1),
+            x:c,
             y:-1,
             index:0,
             crash:getCrash(walls,f)
@@ -120,7 +150,7 @@ Ghost.prototype.nextMove=function(){
           // Siguiente hacia abajo
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y+1),
-            x:(this.vel+1),
+            x:c,
             y:1,
             index:1,
             crash:getCrash(walls,f)
@@ -128,58 +158,63 @@ Ghost.prototype.nextMove=function(){
         // Siguiente a la derecha
         validPosition.push({
           distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x+1,f.y),
-          x:(this.vel+1)+1,
+          x:c+1,
           y:0,
           index:2,
           crash:getCrash(walls,f)
         });
             break;
  }
-  validPosition= validPosition.filter(function(p){return p.crash===0});
- validPosition.sort(function (a, b) {
-    if (a.distance > b.distance) {
-      return 1;
-    }
-    if (a.distance < b.distance) {
-      return -1;
-    }
-    // a must be equal to b
-    return 0;
-  });
+    validPosition= validPosition.filter(function(p){return p.crash===0});
+    validPosition.sort(function (a, b) {
+        if (a.distance > b.distance) {
+          return 1;
+        }
+        if (a.distance < b.distance) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
  randomInd=Math.floor(Math.random()*validPosition.length);
- if (frame%200===0){
-   console.log("esto es perseguir "+perseguir);
-    perseguir ? perseguir=false:perseguir=true;
- }
- if (perseguir){
-     // if (randomInd<0.5||validPosition.length===1){
-          this.index=validPosition[0].index;
-          this.x+=validPosition[0].x;
-          this.y+=validPosition[0].y;
-    /*    }else if(0.5<randomInd<0.75&&validPosition.length===3){
-          this.index=validPosition[1].index;
-          this.x+=validPosition[1].x;
-          this.y+=validPosition[1].y;
-        }else if(0.75<randomInd<1&&validPosition.length===3){
-          this.index=validPosition[2].index;
-          this.x+=validPosition[2].x;
-          this.y+=validPosition[2].y;
-        } else if (0.5<randomInd<1&&validPosition.length===2){
-          this.index=validPosition[1].index;
-          this.x+=validPosition[1].x;
-          this.y+=validPosition[1].y;
-        }*/
- }else{
-  this.index=validPosition[randomInd].index;
-  this.x+=validPosition[randomInd].x;
-  this.y+=validPosition[randomInd].y;
- }
-
+      if (frame%this.chaserfrequency===0){
+        this.chasing ? this.chasing=false:this.chasing=true;
+      }
+      if (this.chasing){
+          //  if (randomInd<0.5||validPosition.length===1){
+                this.index=validPosition[0].index;
+                this.x+=validPosition[0].x;
+                this.y+=validPosition[0].y;
+      }else {
+        this.index=validPosition[randomInd].index;
+        this.x+=validPosition[randomInd].x;
+        this.y+=validPosition[randomInd].y;
+      }
+  }
 
  // this.updateGhost(validPosition[g.index].index);
   //this.updateGhost(validPosition[0].index);
 
-}
+
+
+Ghost.prototype.vulnerable =function(){
+    this.vulnerability=true;
+    this.img.src="./images/vulnerable.png";
+    setTimeout(function (){
+      this.vulnerability=false;
+     if (this.name==="redy"){
+      this.img.src="./images/redGhost.png";
+     } else if ((this.name==="blue")){
+      this.img.src="./images/blueGhost.png";
+     }else if (this.name==="pinky"){
+      this.img.src="./images/pinkyGhost.png";
+     } else if ((this.name==="orange")){
+      this.img.src="./images/orangeGhost.png";
+     }
+    }.bind(this),4000);
+
+};
+
 
 function getCrash(walls,g){
   var crasH=0;
@@ -199,27 +234,3 @@ function getDistance(x1,y1,x2,y2){
   var yD = y2-y1;
   return Math.sqrt(Math.pow(xD,2) + Math.pow(yD,2));
 } 
-
-
-Ghost.prototype.updateGhost=function(index){
-  switch (index? this.direction[index]:this.direction[this.index]){
-      case "up":
-      this.y-=this.vel; 
-      break;
-      case "down":
-      this.y+=this.vel;
-      break;
-      case "right":
-      this.x+=this.vel;
-      break;
-      case "left":
-      this.x-=this.vel;
-      break;
-  }
-}
-
-Ghost.prototype.vulnerability =function(){
-    this.vulnerability=true;
-    var vtime=300;
-    return vtime;
-};

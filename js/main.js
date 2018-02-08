@@ -1,9 +1,9 @@
 // We declar canvas and mygame outside the document.ready so 
 // they are global and we can call them from any object
-var perseguir=true;
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var myGame;
+var gameover=false;
 var escala=30;
 canvas.height=canvas.height*escala;
 canvas.width=canvas.width*escala;
@@ -12,6 +12,7 @@ var board;
 var pacman;
 var frame=0;
 var interval;
+var powerUp=[];
 var playing=true;
 var pause=false;
 var wallsData=[
@@ -30,52 +31,80 @@ music.src = "./Audios/pacman-song.mp3";
 
 // START of the GAME
 $(document).ready (function (){
-    $("section button").on("click",function(e){
+    $("#play").on("click",function(e){
         //esto inicia todo
+        $("#play").css("display","none");
         myGame = new Game ();
         generateWalls();
         generateFood();
+        generatePowerUp();
         keyListener();
         interval = setInterval(updateGame,1000/fps)
     });
 });
 // Me dibuja todo y actualiza
 function updateGame(){
-    if (!pause){
+    if (!pause&&!gameover){
         ctx.clearRect(0,0,canvas.width,canvas.height);                     
         myGame.board.drawBoard();
-        walls.forEach(function(w){ w.drawWall();});
         food.forEach(function(f){f.drawFood();});
         myGame.pacman.updatePacman();
         myGame.pacman.drawPacman();
+        walls.forEach(function(w){ w.drawWall();});
+        powerUp.forEach(function(p){ p.drawPowerUp();});
         checkIfCrash(); // checa pacman
-        if (frame==115){
+       if (frame<55){
+
+        myGame.blueGhost.updateGhost();
+        myGame.redGhost.updateGhost();
+       }else if (frame<90){
+        myGame.blueGhost.updateGhost();
+        myGame.redGhost.updateGhost();
+        myGame.pinkyGhost.updateGhost();
+        myGame.orangeGhost.updateGhost();
+
+        }else if (frame===90) {
             myGame.blueGhost.index=2;
             myGame.blueGhost.updateGhost()
             myGame.redGhost.index=3;
-            myGame.redGhost.updateGhost()
-        }else if (frame<115) {
-            myGame.blueGhost.updateGhost();
             myGame.redGhost.updateGhost();
+            myGame.pinkyGhost.updateGhost();
+            myGame.orangeGhost.updateGhost();
+        }else if (frame<140){
+            
+        myGame.blueGhost.updateGhost();
+        myGame.redGhost.updateGhost();
+        myGame.pinkyGhost.updateGhost();
+        myGame.orangeGhost.updateGhost();
+        }else if (frame===140){
+            myGame.pinkyGhost.index=2;
+            myGame.pinkyGhost.updateGhost()
+            myGame.orangeGhost.index=3;
+            myGame.orangeGhost.updateGhost();
+      
         }else{
             checkIfCrashGhost(myGame.redGhost,20); // checa ghost y lo mueve
-            checkIfCrashGhost(myGame.blueGhost,20);
+            checkIfCrashGhost(myGame.blueGhost,40);
+            checkIfCrashGhost(myGame.pinkyGhost,60);
+            checkIfCrashGhost(myGame.orangeGhost,80);
         }
         myGame.blueGhost.drawGhost();
         myGame.redGhost.drawGhost();
-      // checa ghost 2 y lo mueve
-    // myGame.blueGhost.updateGhost();
+        myGame.pinkyGhost.drawGhost();
+        myGame.orangeGhost.drawGhost();
         frame+=1;
-        if (frame%300===0){
-            myGame.redGhost.vel+=1;
-        } else if (frame%500===0){
-            myGame.blueGhost.vel+=1;
-        }
-        score();
+        drawScore(myGame.pacman.finalScore,myGame.pacman.score);
 music.play()
     }
 }
+function drawScore(player,score){
+    ctx.fillStyle="white";
+    ctx.font="50px Arial";
+    ctx.fillText("SCORE PLAYER 1"+" : "+Math.round(score),50,50);
+    ctx.fillText("SCORE PLAYER 2"+" : "+Math.round(player[0]),canvas.width-600,canvas.height-20);
+ }
 
+ 
 
   // EVENTS LISTENERSSS
   function keyListener(){
@@ -102,17 +131,31 @@ music.play()
             console.log(pause);
              pause? pause=false:pause=true;         
                 break;
+            case 27: //arrow down       
+            startGame();
+                break;
         }
     });
 }
 //Main function
-function startGame(){
-    //se debe resetear todo!!!! 
-    frames = 0;
-    board = new Board();
-    pacman = new Pacman();
-    interval = setInterval(updateGame,1000/60);
-  }
+function startGame(){  
+    var gameover=false;
+    frame=0;
+    playing=true;
+    pause=false;
+    food=[];
+    powerUp=[];
+    walls=[];
+    ctx.clearRect(0,0,canvas.width,canvas.height); 
+    myGame=undefined;
+    myGame = new Game ();
+    generateWalls();
+    generateFood();
+    generatePowerUp();
+    keyListener();
+    interval = setInterval(updateGame,1000/fps)
+}
+
 
 //*********************************************************************** */
 
@@ -137,33 +180,90 @@ function generateFood(){
        }
    }
   }
+  function generatePowerUp(){
+        powerUp.push(new PowerUp(4*escala,4*escala));
+        powerUp.push(new PowerUp(38*escala,4*escala));
+        powerUp.push(new PowerUp(4*escala,20*escala));
+        powerUp.push(new PowerUp(38*escala,20*escala));
+   }
+  
 
-
-function score (){
-    ctx.fillStyle="white";
-    ctx.font="20px Arial";
-   // ctx.fillText(Math.round(frame/30),200,200);
-   ctx.fillText(Math.round(myGame.pacman.score),200,200);
-}
 /**************************COLISIONES***********************************************/
 function checkIfCrash(){
-        walls.forEach(function(w){
-          if(crashWith(myGame.pacman,w)){
-            myGame.pacman.direction="";
-          } else if (myGame.pacman){
-                // aqui mirar si choca contra ghost muerte
-                // myGame
-          }
-              // estoy mirando si choca contra muro
-              //tengo que mirar si choca contra ghost tb y ahi seria game o   // en el caso de los muros tengo que hacer hacer velocidad cero y 
-         });
+// With Walls 
+        walls.forEach(function(w){if(crashWith(myGame.pacman,w)){ moveBack();}});
+// with Ghosts
+        if (crashWith(myGame.pacman,myGame.blueGhost)){
+            if (myGame.blueGhost.vulnerability){
+                myGame.blueGhost.killed();
+                myGame.pacman.score+=myGame.blueGhost.points;
+            }else{
+                myGame.pacman.killed();
+            }
+            
+        }else if (crashWith(myGame.pacman,myGame.redGhost)){
+            if (myGame.redGhost.vulnerability){
+                myGame.redGhost.killed();
+                myGame.pacman.score+=myGame.redGhost.points;
+            }else{
+                myGame.pacman.killed();
+            }
+        }else if (crashWith(myGame.pacman,myGame.pinkyGhost)){
+            if (myGame.pinkyGhost.vulnerability){
+                myGame.pinkyGhost.killed();
+                myGame.pacman.score+=myGame.pinkyGhost.points;
+            }else{
+                myGame.pacman.killed();
+            }
+            
+        }else if (crashWith(myGame.pacman,myGame.orangeGhost)){
+            if (myGame.orangeGhost.vulnerability){
+                myGame.orangeGhost.killed();
+                myGame.pacman.score+=myGame.orangeGhost.points;
+            }else{
+                myGame.pacman.killed();
+            }
+        }
+
+// with food
         food.forEach(function(f,index){
             if(crashWith(myGame.pacman,f)){
                 food.splice(index,1);
                 myGame.pacman.score+=f.points;
             }
         });
+// with powerUP
+   powerUp.forEach(function(p,index){
+    if(crashWith(myGame.pacman,p)){
+        powerUp.splice(index,1);
+        myGame.pacman.score+=p.points;
+        myGame.redGhost.vulnerable()
+        myGame.blueGhost.vulnerable();
+        myGame.pinkyGhost.vulnerable()
+        myGame.orangeGhost.vulnerable();
+    }
+});
 }
+function moveBack(){
+switch (myGame.pacman.direction) {
+    case "up":
+    myGame.pacman.moveDown();
+    break;
+    case "down":
+    myGame.pacman.moveUp();
+    break;
+    case "right":
+    myGame.pacman.moveLeft();
+    break;
+    case "left":
+    myGame.pacman.moveRight();
+    break;
+    default:
+    myGame.pacman.direction="";
+        break;
+  }  
+}
+
 
 function checkIfCrashGhost(ghost,fps){
     var crashed=0;
