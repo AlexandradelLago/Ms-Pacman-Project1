@@ -1,11 +1,10 @@
 function Pacman() {
-    Collision.call(this);
     this.x=18*escala;
-    this.y=14*escala;
+    this.y=14.5*escala;
     this.vel=1;
     this.lives=3;
-    this.width=50;
-    this.height=50;
+    this.width=60;
+    this.height=60;
     this.img = new Image();
     this.img.src=images.eatingPacman;
     // el this dentro de addEventlistere seria la imagen para que siga hablando de la claase
@@ -18,16 +17,19 @@ function Pacman() {
     this.score=0;
     this.direction="";
     this.frame=0;
+   // this.mouthOpened=true;
     this.stopped=false;
 };
 // hacer que pacman me cambie de imagen con los sprite pero PRIMORDIAL es el movimiento
 Pacman.prototype.drawPacman= function (){
     this.frame+=1;
-    if (this.frames%60===0){
-        if (this.animation===this.animation1){
-            this.animation=this.animation2;
+    if (this.frame%30===0&&this.direction){
+        if (this.mouthOpened){
+            this.img.src=images.closedPacman;
+            this.mouthOpened=false;
         } else {
-            this.animation=this.animation2;
+            this.img.src=images.eatingPacman
+            this.mouthOpened=true;
         }
     }
     ctx.drawImage(this.img,this.x,this.y,this.width,this.height); 
@@ -50,23 +52,19 @@ Pacman.prototype.updatePacman=function(){
 }
 Pacman.prototype.moveUp = function(){
         
-        this.y-=2; 
+        this.y-=3; 
 };
 
 Pacman.prototype.moveDown = function(){
-        this.y+=2;
+        this.y+=3;
 };
 
 Pacman.prototype.moveLeft = function(){
-        this.x-=2;
+        this.x-=3;
 };
 
 Pacman.prototype.moveRight = function(){
-        this.x+=2;   
-};
-
-Pacman.prototype.EatFood = function (){
-    this.score+=1;
+        this.x+=3;   
 };
 
 Pacman.prototype.killed= function(){
