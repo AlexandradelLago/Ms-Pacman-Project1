@@ -65,6 +65,9 @@ Pacman.prototype.moveRight = function(){
 };
 
 Pacman.prototype.killed= function(){
+    setTimeout(function(){
+        die.play();
+    },500);
    if (this.lives!=0){
     this.lives--;
     this.score-=500;

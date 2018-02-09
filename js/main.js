@@ -28,6 +28,8 @@ var imagesmr=["./images/openedPacman.png","./images/pacmancerrado.png"];
 
 var music = new Audio();
 music.src = "./Audios/pacman-song.mp3";
+var die = new Audio();
+die.src="./Audios/pacman_death.wav";
 
 // START of the GAME
 $(document).ready (function (){
@@ -118,7 +120,7 @@ function updateGame(){
         myGame.orangeGhost.drawGhost();
         frame+=1;
         drawScore();
-//music.play()
+music.play()
         checkIfGameOver();
     }
 }
