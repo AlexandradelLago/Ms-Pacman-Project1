@@ -9,12 +9,12 @@ canvas.height=canvas.height*escala;
 canvas.width=canvas.width*escala;
 var fps=60; // minimum 30 and optimal is 60 fps for a game
 var board;
-var pacman;
 var frame=0;
 var interval;
 var powerUp=[];
 var playing=true;
 var pause=false;
+var finalScore=[];
 var wallsData=[
     [1,1,39,1],[1,2,1,20],[1,21,39,1],[39,2,1,20],[5,5,1,5],[5,13,1,5],[35,5,1,5],[35,13,1,5],
     [15,9,1,5],[25,9,1,5],[23,9,2,1],[6,5,2,1],[6,17,2,1],[33,5,2,1],[33,17,2,1],[16,9,2,1],[9,9,3,1],
@@ -22,10 +22,10 @@ var wallsData=[
 ];
 var walls=[];
 var food=[];
-var images={
-    eatingPacman:"./images/ms_pac_man.png",
-    closedPacman:"./images/closedPacman.png"
-};
+var imagesms=["./images/ms_pac_man.png","./images/mspacmanclosed.png"];
+// HACER ESTO-SPRITES!!!
+var imagesmr=["./images/openedPacman.png","./images/pacmancerrado.png"];
+
 var music = new Audio();
 music.src = "./Audios/pacman-song.mp3";
 
@@ -34,120 +34,25 @@ $(document).ready (function (){
     $("#play").on("click",function(e){
         //esto inicia todo
         $("#play").css("display","none");
-        myGame = new Game ();
-        generateWalls();
-        generateFood();
-        generatePowerUp();
-        keyListener();
-        interval = setInterval(updateGame,1000/fps)
+        startGame();
     });
+
+    $("#startagain").on("click",function(e){
+        //esto inicia todo
+        gameover=false;
+        frame=0;
+        playing=true;
+        pause=false;
+        food=[];
+        powerUp=[];
+        walls=[];
+        myGame=undefined;
+        startGame();
+    });
+
 });
-// Me dibuja todo y actualiza
-function updateGame(){
-    if (!pause&&!gameover){
-        ctx.clearRect(0,0,canvas.width,canvas.height);                     
-        myGame.board.drawBoard();
-        food.forEach(function(f){f.drawFood();});
-        myGame.pacman.updatePacman();
-        myGame.pacman.drawPacman();
-        walls.forEach(function(w){ w.drawWall();});
-        powerUp.forEach(function(p){ p.drawPowerUp();});
-        checkIfCrash(); // checa pacman
-       if (frame<55){
-
-        myGame.blueGhost.updateGhost();
-        myGame.redGhost.updateGhost();
-       }else if (frame<90){
-        myGame.blueGhost.updateGhost();
-        myGame.redGhost.updateGhost();
-        myGame.pinkyGhost.updateGhost();
-        myGame.orangeGhost.updateGhost();
-
-        }else if (frame===90) {
-            myGame.blueGhost.index=2;
-            myGame.blueGhost.updateGhost()
-            myGame.redGhost.index=3;
-            myGame.redGhost.updateGhost();
-            myGame.pinkyGhost.updateGhost();
-            myGame.orangeGhost.updateGhost();
-        }else if (frame<140){
-            
-        myGame.blueGhost.updateGhost();
-        myGame.redGhost.updateGhost();
-        myGame.pinkyGhost.updateGhost();
-        myGame.orangeGhost.updateGhost();
-        }else if (frame===140){
-            myGame.pinkyGhost.index=2;
-            myGame.pinkyGhost.updateGhost()
-            myGame.orangeGhost.index=3;
-            myGame.orangeGhost.updateGhost();
-      
-        }else{
-            checkIfCrashGhost(myGame.redGhost,20); // checa ghost y lo mueve
-            checkIfCrashGhost(myGame.blueGhost,40);
-            checkIfCrashGhost(myGame.pinkyGhost,60);
-            checkIfCrashGhost(myGame.orangeGhost,80);
-        }
-        myGame.blueGhost.drawGhost();
-        myGame.redGhost.drawGhost();
-        myGame.pinkyGhost.drawGhost();
-        myGame.orangeGhost.drawGhost();
-        frame+=1;
-        drawScore(myGame.pacman.finalScore,myGame.pacman.score);
-music.play()
-    }
-}
-function drawScore(player,score){
-    ctx.fillStyle="white";
-    ctx.font="50px Arial";
-    ctx.fillText("SCORE PLAYER 1"+" : "+Math.round(score),50,50);
-    ctx.fillText("SCORE PLAYER 2"+" : "+Math.round(player[0]),canvas.width-600,canvas.height-20);
- }
-
- 
-
-  // EVENTS LISTENERSSS
-  function keyListener(){
-    document.addEventListener("keydown", function(e){
-        switch (e.keyCode) {
-            case 38: //w
-            console.log(pause);
-              myGame.pacman.direction="up";
-              myGame.pacman.updatePacman();         
-                break;
-            case 40: //s
-            myGame.pacman.direction="down";
-            myGame.pacman.updatePacman();
-                break;
-            case 39: //arrow up
-            myGame.pacman.direction="right";
-            myGame.pacman.updatePacman();
-                break;
-            case 37: //arrow down
-            myGame.pacman.direction="left";        
-            myGame.pacman.updatePacman();
-                break;
-            case 80: //w
-            console.log(pause);
-             pause? pause=false:pause=true;         
-                break;
-            case 27: //arrow down       
-            startGame();
-                break;
-        }
-    });
-}
-//Main function
 function startGame(){  
-    var gameover=false;
-    frame=0;
-    playing=true;
-    pause=false;
-    food=[];
-    powerUp=[];
-    walls=[];
     ctx.clearRect(0,0,canvas.width,canvas.height); 
-    myGame=undefined;
     myGame = new Game ();
     generateWalls();
     generateFood();
@@ -155,11 +60,173 @@ function startGame(){
     keyListener();
     interval = setInterval(updateGame,1000/fps)
 }
+// Me dibuja todo y actualiza
+function updateGame(){
+    if (!pause&&!gameover){
+        ctx.clearRect(0,0,canvas.width,canvas.height);                     
+        myGame.board.drawBoard();
+        food.forEach(function(f){f.drawFood();});
+        myGame.pacman.updatePacman();
+        myGame.mspacman.updatePacman();
+
+        myGame.mspacman.drawPacman();
+        myGame.pacman.drawPacman();
+        walls.forEach(function(w){ w.drawWall();});
+        powerUp.forEach(function(p){ p.drawPowerUp();});
+        checkIfCrash(myGame.pacman); 
+        checkIfCrash(myGame.mspacman);
+        //INICIO DE LOS FANTASMAS Y MOVIMIENTOS
+        if (frame<55){
+                myGame.blueGhost.updateGhost();
+                myGame.redGhost.updateGhost();
+         }else if (frame<90){
+                myGame.blueGhost.updateGhost();
+                myGame.redGhost.updateGhost();
+                myGame.pinkyGhost.updateGhost();
+                myGame.orangeGhost.updateGhost();
+        }else if (frame===90) {
+                myGame.blueGhost.index=2;
+                myGame.blueGhost.updateGhost()
+                myGame.redGhost.index=3;
+                myGame.redGhost.updateGhost();
+                myGame.pinkyGhost.updateGhost();
+                myGame.orangeGhost.updateGhost();
+        }else if (frame<140){
+                myGame.blueGhost.updateGhost();
+                myGame.redGhost.updateGhost();
+                myGame.pinkyGhost.updateGhost();
+                myGame.orangeGhost.updateGhost();
+        }else if (frame===140){
+                myGame.pinkyGhost.index=2;
+                myGame.pinkyGhost.updateGhost()
+                myGame.orangeGhost.index=3;
+                myGame.orangeGhost.updateGhost();
+         }else if (frame<200){
+                    myGame.pinkyGhost.updateGhost()
+                    myGame.orangeGhost.updateGhost();
+         } else {
+                // MIRA SI FANTASMA CHOCA PARA MOVERLO PERSIGUIENDO A PACMAN O RANDOM 
+                moveGhost(myGame.redGhost,20); 
+                moveGhost(myGame.blueGhost,40);
+                moveGhost(myGame.pinkyGhost,50);
+                moveGhost(myGame.orangeGhost,70);
+        }
+        // DIBUJO LOS FANTASMAS
+        myGame.blueGhost.drawGhost();
+        myGame.redGhost.drawGhost();
+        myGame.pinkyGhost.drawGhost();
+        myGame.orangeGhost.drawGhost();
+        frame+=1;
+        drawScore();
+//music.play()
+        checkIfGameOver();
+    }
+}
+function checkIfGameOver(){
+    if (myGame.pacman.lives===0&&myGame.mspacman.lives===0){
+        finalScore[0]=myGame.pacman.score;
+        finalScore[1]=myGame.mspacman.score;
+        gameOver();
+        gameover=true; 
+    }
 
 
-//*********************************************************************** */
+    if (food===[]){
+        finalScore[0]=myGame.pacman.score;
+        finalScore[1]=myGame.mspacman.score;
+        gameOver();
+        gameover=true;
+    }
+}
 
-// me crea los objeto muro a partir de las coordenadas, w y h guardados en wallsData y los guarda en wall
+function gameOver(){
+
+    clearInterval(interval);
+        
+    if (finalScore[0]>finalScore[1]){
+        ctx.fillStyle="red";
+        ctx.font="50px Arial";
+        ctx.fillText(" MR. PACMAN wins with a score of"+finalScore[0],100,canvas.height/2);
+    } else{
+        ctx.fillStyle="red";
+        ctx.font="50px Arial";
+        ctx.fillText("MS. PACMAN wins with a score of "+finalScore[1],100,canvas.height/2);
+    }
+    $("section").append(" <button id='startagain'>bliss</button>");
+    $("#startagain").text("START AGAIN");
+   
+}
+
+function drawScore(){
+    ctx.fillStyle="white";
+    ctx.font="40px Arial";
+
+    ctx.fillText("SCORE MR PACMAN "+" : "+Math.round(myGame.pacman.score)+" LIVES: "+myGame.pacman.lives,50,50);
+    ctx.fillText("SCORE MS PACMAN "+" : "+Math.round(myGame.mspacman.score)+" LIVES: "+myGame.mspacman.lives,300,canvas.height-20);
+ }
+
+ 
+
+  // EVENTS LISTENERSSS
+  function keyListener(){
+    document.addEventListener("keydown", function(e){
+     if (myGame.mspacman.lives!=0){
+        switch (e.keyCode) {
+            case 38: //w
+            console.log(pause);
+              myGame.mspacman.direction="up";
+              myGame.mspacman.updatePacman();         
+                break;
+            case 40: //s
+            myGame.mspacman.direction="down";
+            myGame.mspacman.updatePacman();
+                break;
+            case 39: //arrow up
+            myGame.mspacman.direction="right";
+            myGame.mspacman.updatePacman();
+                break;
+            case 37: //arrow down
+            myGame.mspacman.direction="left";        
+            myGame.mspacman.updatePacman();
+                break;
+            case 80: //w
+            console.log(pause);
+            pause? pause=false:pause=true;         
+                break;
+    
+        }
+     }   
+    if (myGame.pacman.lives!=0){
+        switch (e.keyCode) {
+            case 80: //w
+            console.log(pause);
+             pause? pause=false:pause=true;         
+                break;
+            case 87: //w
+            console.log(pause);
+            myGame.pacman.direction="up";
+            myGame.pacman.updatePacman();         
+                break;
+            case 90: //s
+            myGame.pacman.direction="down";
+            myGame.pacman.updatePacman();
+                break;
+            case 83: //arrow up
+            myGame.pacman.direction="right";
+            myGame.pacman.updatePacman();
+                break;
+            case 65: //arrow down
+            myGame.pacman.direction="left";        
+            myGame.pacman.updatePacman();
+            break; 
+        }
+    }
+});
+
+}
+
+//**************************  Generate WALLS, FOOD, POWERUPS, EXTRA FRUITS*********************************** */
+
 function generateWalls(){
     wallsData.forEach(function(e){
     walls.push(new Wall(e[0]*escala,e[1]*escala,e[2]*escala,e[3]*escala));
@@ -189,54 +256,57 @@ function generateFood(){
   
 
 /**************************COLISIONES***********************************************/
-function checkIfCrash(){
+function checkIfCrash(pacman){
 // With Walls 
-        walls.forEach(function(w){if(crashWith(myGame.pacman,w)){ moveBack();}});
+        walls.forEach(function(w){if(crashWith(pacman,w)){ moveBack(pacman);}});
 // with Ghosts
-        if (crashWith(myGame.pacman,myGame.blueGhost)){
+        if (crashWith(pacman,myGame.blueGhost)){
             if (myGame.blueGhost.vulnerability){
                 myGame.blueGhost.killed();
-                myGame.pacman.score+=myGame.blueGhost.points;
+                pacman.score+=myGame.blueGhost.points;
             }else{
-                myGame.pacman.killed();
+                pacman.killed();
             }
             
-        }else if (crashWith(myGame.pacman,myGame.redGhost)){
+        }else if (crashWith(pacman,myGame.redGhost)){
             if (myGame.redGhost.vulnerability){
                 myGame.redGhost.killed();
-                myGame.pacman.score+=myGame.redGhost.points;
+                pacman.score+=myGame.redGhost.points;
             }else{
-                myGame.pacman.killed();
+                pacman.killed();
             }
-        }else if (crashWith(myGame.pacman,myGame.pinkyGhost)){
+        }else if (crashWith(pacman,myGame.pinkyGhost)){
             if (myGame.pinkyGhost.vulnerability){
                 myGame.pinkyGhost.killed();
-                myGame.pacman.score+=myGame.pinkyGhost.points;
+                pacman.score+=myGame.pinkyGhost.points;
             }else{
-                myGame.pacman.killed();
+                pacman.killed();
             }
             
-        }else if (crashWith(myGame.pacman,myGame.orangeGhost)){
+        }else if (crashWith(pacman,myGame.orangeGhost)){
             if (myGame.orangeGhost.vulnerability){
                 myGame.orangeGhost.killed();
-                myGame.pacman.score+=myGame.orangeGhost.points;
+                pacman.score+=myGame.orangeGhost.points;
             }else{
-                myGame.pacman.killed();
+                pacman.killed();
             }
         }
 
 // with food
         food.forEach(function(f,index){
-            if(crashWith(myGame.pacman,f)){
+            if(crashWith(pacman,f)){
                 food.splice(index,1);
-                myGame.pacman.score+=f.points;
+                pacman.score+=f.points;
+                if (food===[]){
+                    pacman.newMaze();
+                }
             }
         });
 // with powerUP
    powerUp.forEach(function(p,index){
-    if(crashWith(myGame.pacman,p)){
+    if(crashWith(pacman,p)){
         powerUp.splice(index,1);
-        myGame.pacman.score+=p.points;
+        pacman.score+=p.points;
         myGame.redGhost.vulnerable()
         myGame.blueGhost.vulnerable();
         myGame.pinkyGhost.vulnerable()
@@ -244,58 +314,48 @@ function checkIfCrash(){
     }
 });
 }
-function moveBack(){
-switch (myGame.pacman.direction) {
+
+
+
+
+function moveBack(pacman){
+switch (pacman.direction) {
     case "up":
-    myGame.pacman.moveDown();
+    pacman.moveDown();
     break;
     case "down":
-    myGame.pacman.moveUp();
+    pacman.moveUp();
     break;
     case "right":
-    myGame.pacman.moveLeft();
+    pacman.moveLeft();
     break;
     case "left":
-    myGame.pacman.moveRight();
+    pacman.moveRight();
     break;
     default:
-    myGame.pacman.direction="";
+    pacman.direction="";
         break;
   }  
 }
 
 
-function checkIfCrashGhost(ghost,fps){
+function moveGhost(ghost,fps){
     var crashed=0;
         walls.forEach(function(w){
              if (crashWith(ghost,w)){
-                // console.log(ghost);
-                // console.log(w);
                 ghost.nextMove();
                 console.log("esto es crashed " +crashed);
                 crashed+=1;
                 ghost.updateGhost();
-             /*   console.log(w);
-                console.log(ghost.crashWith(w));
-                var index1=Math.floor(Math.random()*4);
-                console.log(index1);
-                ghost.updateGhost(index1);*/
             }
         });
         if(crashed===0&&frame%fps===0){
-           // console.log("estoy en cambio random de direccion")
             var index=Math.floor(Math.random()*4);
-          //  console.log(index);
             this.index=index;
-           // console.log(this.index);
             ghost.updateGhost(index);
        }else if(crashed===0){
            ghost.updateGhost();
         }
-              // aqui mirar si choca contra ghost muerte
-              // myGame
-            // estoy mirando si choca contra muro
-            //tengo que mirar si choca contra ghost tb y ahi seria game o   // en el caso de los muros tengo que hacer hacer velocidad cero y   
 }
 
 

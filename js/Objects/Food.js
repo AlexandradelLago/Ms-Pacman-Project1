@@ -4,7 +4,6 @@ function Food(x,y){
     this.ratius=escala*0.2;
     this.width=this.ratius*2;
     this.height=this.ratius*2;
-    
     this.points=30;
     this.ate=false;
     this.color="yellow";

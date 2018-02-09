@@ -21,11 +21,11 @@ function Ghost(x,y,img,name,chaserfrequency){
 
 Ghost.prototype.killed=function (){
   this.x=18.5*escala;
-  this.y=10*escala;
+  this.y=7*escala;
   this.vel=1;
   this.vulnerability=false;
   this.alive=true;
-  this.index=0;
+  this.index=2;
 }
 
 Ghost.prototype.updateGhost=function(index){
@@ -55,26 +55,15 @@ Ghost.prototype.nextMove=function(){
   var c= this.vel+1;
   var f={x:this.x,y:this.y,w:this.width,h:this.height};
  switch (this.index) {
-   // choco arriba 
-   case 0:
-            
+   case 0: // COLLISION WHILE HEADING UP
             f.y=this.y+c;
             // Vengo de abajo  Siguiente hacia abajo (0,1+c)
             validPosition.push({
-              distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y+1),
-              x:0,
-              y:c+1,
-              index:1,
-              crash:getCrash(walls,f)
-          });
-         
+              distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x,f.y+1),x:0,
+              y:c+1,index:1,crash:getCrash(walls,f)});
           validPosition.push({  // Siguiente a la derecha
-            distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x+1,f.y),
-            x:1,
-            y:c,
-            index:2,
-            crash:getCrash(walls,f)
-          });
+            distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x+1,f.y), x:1, y:c,
+            index:2,crash:getCrash(walls,f)});
           // Siguiente a la izquierda
           validPosition.push({
             distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x-1,f.y),
@@ -84,7 +73,8 @@ Ghost.prototype.nextMove=function(){
             crash:getCrash(walls,f) 
           });
               break;
-    case 1:
+    case 1: // COLLISION WHILE HEADING DOWN
+   
               f.y=this.y-c;
             validPosition.push({
               distance:getDistance(myGame.pacman.x,myGame.pacman.y,f.x+1,f.y),
@@ -173,15 +163,14 @@ Ghost.prototype.nextMove=function(){
         if (a.distance < b.distance) {
           return -1;
         }
-        // a must be equal to b
         return 0;
       });
- randomInd=Math.floor(Math.random()*validPosition.length);
+   randomInd=Math.floor(Math.random()*validPosition.length);
+
       if (frame%this.chaserfrequency===0){
         this.chasing ? this.chasing=false:this.chasing=true;
       }
       if (this.chasing){
-          //  if (randomInd<0.5||validPosition.length===1){
                 this.index=validPosition[0].index;
                 this.x+=validPosition[0].x;
                 this.y+=validPosition[0].y;
@@ -191,10 +180,6 @@ Ghost.prototype.nextMove=function(){
         this.y+=validPosition[randomInd].y;
       }
   }
-
- // this.updateGhost(validPosition[g.index].index);
-  //this.updateGhost(validPosition[0].index);
-
 
 
 Ghost.prototype.vulnerable =function(){
