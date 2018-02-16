@@ -26,6 +26,7 @@ Ghost.prototype.killed=function (){
   this.vulnerability=false;
   this.alive=true;
   this.index=2;
+  
 }
 
 Ghost.prototype.updateGhost=function(index){

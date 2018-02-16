@@ -11,29 +11,68 @@ header{
     flex-direction: row;
     flex-flow: nowrap;
     justify-content: space-around;
-    background: rgb(39, 100, 212);
     padding:0;
+    background:   linear-gradient(
+        rgba(6, 21, 104, 0.45), 
+        rgba(21, 20, 20, 0.728)
+      ), url("../images/pacmanBackground.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100px;
+ 
 }
-header h1{
+.instructions li{
+    color:white;
+    font-family: Courier New, Courier, monospace;
+    text-transform: uppercase;
+    width:500px;
+    padding-left:300px;
+    list-style-type: none;
+    line-height: 1.8;
+}
+.pac-dot{
+    color:yellow;
+    font-weight: bold;
+}
+.energizer{
     color:#db1973;
-    text-align: left;
-    padding:0;
-    margin:0;
+    font-size: 2em;
+    font-weight: bold;
 }
+
+header h1{
+    color: #ffe534;
+    font-family: Courier New, Courier, monospace;
+    text-overflow: ellipsis;
+    font-size: 3em;
+    text-align: left;
+    padding:20;
+    margin-top:10;
+    text-shadow: 0 0 5px #000; /* horizontal-offset vertical-offset 'blur' colour */
+    -moz-text-shadow: 0 0 5px #000;
+    -webkit-text-shadow: 0 0 5px #000;
+
+
+}
+
+
+
 footer{
     background: lightgrey;
 }
-section {
-    margin:20px 100px;
+.main {
+    margin:0px;
     display:flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    background-image: url("./images/msPacmanBackground.jpg");
+    background-image: url("../images/pacman&ghostsBG.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 section button{
     width:100px;
     height:100px;
-    border-radius: 30%;
+    border-radius: 60%;
     background-color: #ffe534;
     text-transform: uppercase;
     writing-mode:vertical-rl;
@@ -42,6 +81,8 @@ section button{
     font-size:2em;
     margin-left: 20px;
     display:inline-block;
+    margin-top:50px;
+    
 }
 
 canvas {

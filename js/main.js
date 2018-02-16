@@ -4,7 +4,7 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var myGame;
 var gameover=false;
-var escala=30;
+var escala=28;
 canvas.height=canvas.height*escala;
 canvas.width=canvas.width*escala;
 var fps=60; // minimum 30 and optimal is 60 fps for a game
@@ -33,9 +33,9 @@ die.src="./Audios/pacman_death.wav";
 
 // START of the GAME
 $(document).ready (function (){
-    $("#play").on("click",function(e){
+    $(".play-btn").on("click",function(e){
         //esto inicia todo
-        $("#play").css("display","none");
+        $(".play").css("display","none");
         startGame();
     });
 
@@ -200,20 +200,16 @@ function drawScore(){
      }   
     if (myGame.pacman.lives!=0){
         switch (e.keyCode) {
-            case 80: //w
-            console.log(pause);
-             pause? pause=false:pause=true;         
-                break;
             case 87: //w
             console.log(pause);
             myGame.pacman.direction="up";
             myGame.pacman.updatePacman();         
                 break;
-            case 90: //s
+            case 83: //s
             myGame.pacman.direction="down";
             myGame.pacman.updatePacman();
                 break;
-            case 83: //arrow up
+            case 68: //arrow up
             myGame.pacman.direction="right";
             myGame.pacman.updatePacman();
                 break;
