@@ -18,7 +18,7 @@ header{
       ), url("../images/pacmanBackground.jpg");
     background-repeat: no-repeat;
     background-size: cover;
-    height: 100px;
+    height: 120px;
  
 }
 .instructions li{
@@ -86,7 +86,7 @@ section button{
 }
 
 canvas {
-    border: 2px solid black;
+
     justify-content: center;
 }
 
